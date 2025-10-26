@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Career Assessment Quiz</title>
+    <style>
+      @font-face {
+        font-family: "GT Alpina";
+        src: url("GT-Alpina-Standard-Light.ttf") format("truetype");
+        font-weight: 300;
+        font-style: normal;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Helvetica Now Text", "Helvetica Neue", Helvetica, Arial,
+          sans-serif;
+        background: #708356;
+        min-height: 100vh;
+        overflow-x: hidden;
+        color: white;
+      }
+
+      /* Progress Bar */
+      .progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        z-index: 1000;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: white;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      /* Question Container */
+      .question-screen {
+        display: none;
+        min-height: 100vh;
+        padding: 80px 40px 40px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .question-screen.section-2 {
+        background: #2b72cf;
+      }
+
+      .question-screen.section-3 {
+        background: #c55e14;
+      }
+
+      .question-screen.active {
+        display: flex;
+        opacity: 1;
+      }
+
+      /* Section Title Screens */
+      .section-title-screen {
+        display: none;
+        min-height: 100vh;
+        padding: 80px 40px 40px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .section-title-screen.section-2 {
+        background: #2b72cf;
+      }
+
+      .section-title-screen.section-3 {
+        background: #c55e14;
+      }
+
+      .section-title-screen.active {
+        display: flex;
+        opacity: 1;
+      }
+
+      .section-title-content {
+        max-width: 800px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .section-title {
+        font-family: "GT Alpina", serif;
+        font-weight: 300;
+        font-size: 3em;
+        line-height: 1.3;
+        margin-bottom: 30px;
+        color: white;
+      }
+
+      .section-description {
+        font-size: 1.3em;
+        line-height: 1.6;
+        margin-bottom: 60px;
+        opacity: 0.9;
+        color: white;
+      }
+
+      .start-section-btn {
+        padding: 18px 50px;
+        background: white;
+        color: #708356;
+        border: none;
+        border-radius: 30px;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Helvetica Now Text", "Helvetica Neue", Helvetica, Arial,
+          sans-serif;
+        font-weight: 600;
+      }
+
+      .start-section-btn:hover {
+        background: rgba(255, 255, 255, 0.9);
+        transform: translateY(-2px);
+      }
+
+      .question-content {
+        max-width: 800px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .section-label {
+        font-size: 0.9em;
+        opacity: 0.8;
+        margin-bottom: 40px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .question-number {
+        font-size: 0.85em;
+        opacity: 0.7;
+        margin-bottom: 20px;
+      }
+
+      .question-text {
+        font-family: "GT Alpina", serif;
+        font-weight: 300;
+        font-size: 2.5em;
+        line-height: 1.3;
+        margin-bottom: 60px;
+        color: white;
+      }
+
+      /* Options */
+      .options {
+        display: flex;
+        gap: 9px;
+        justify-content: center;
+        flex-wrap: nowrap;
+        margin-bottom: 80px;
+      }
+
+      .option-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .option {
+        width: 90px;
+        height: 90px;
+        min-width: 90px;
+        min-height: 90px;
+        max-width: 90px;
+        max-height: 90px;
+        border: 1px solid black;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: black;
+        font-size: 1em;
+        background: #ededed;
+        flex-shrink: 0;
+      }
+
+      .option:hover {
+        background: #d8d8d8;
+        transform: translateY(-2px);
+      }
+
+      .option.selected {
+        background: black;
+        color: white;
+        border-color: black;
+      }
+
+      .option-label {
+        font-size: 0.85em;
+        color: white;
+        max-width: 180px;
+        text-align: center;
+        line-height: 1.4;
+      }
+
+      /* Navigation */
+      .navigation {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 40px;
+      }
+
+      .nav-btn {
+        padding: 15px 40px;
+        border: 2px solid white;
+        background: transparent;
+        color: white;
+        border-radius: 30px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: all 0.3s ease;
+        font-family: "Helvetica Now Text", "Helvetica Neue", Helvetica, Arial,
+          sans-serif;
+      }
+
+      .nav-btn:hover {
+        background: white;
+        color: #708356;
+      }
+
+      .nav-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .nav-btn:disabled:hover {
+        background: transparent;
+        color: white;
+      }
+
+      .nav-btn.primary {
+        background: white;
+        color: #708356;
+      }
+
+      .nav-btn.primary:hover {
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      /* Welcome Screen */
+      .welcome-screen {
+        display: flex;
+        min-height: 100vh;
+        padding: 40px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .corner-decoration {
+        position: absolute;
+        z-index: 1;
+        opacity: 0.8;
+      }
+
+      .corner-decoration.top-left {
+        top: 0;
+        left: 0;
+        width: 300px;
+        height: 300px;
+      }
+
+      .corner-decoration.bottom-right {
+        bottom: 0;
+        right: 0;
+        width: 280px;
+        height: 200px;
+      }
+
+      .welcome-content {
+        position: relative;
+        z-index: 2;
+      }
+
+      .welcome-screen h1 {
+        font-family: "GT Alpina", serif;
+        font-weight: 300;
+        font-size: 3.5em;
+        margin-bottom: 20px;
+        color: white;
+      }
+
+      .welcome-screen p {
+        font-size: 1.3em;
+        opacity: 0.9;
+        margin-bottom: 50px;
+        max-width: 600px;
+      }
+
+      .start-btn {
+        padding: 20px 60px;
+        background: white;
+        color: #708356;
+        border: none;
+        border-radius: 30px;
+        font-size: 1.2em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Helvetica Now Text", "Helvetica Neue", Helvetica, Arial,
+          sans-serif;
+      }
+
+      .start-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Results Screen */
+      .results-screen {
+        display: none;
+        min-height: 100vh;
+        padding: 80px 40px 40px;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .results-screen.active {
+        display: flex;
+      }
+
+      /* Confetti */
+      .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: #fff;
+        position: absolute;
+        animation: confetti-fall 3s linear forwards;
+        pointer-events: none;
+      }
+
+      @keyframes confetti-fall {
+        0% {
+          transform: translateY(-100vh) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(100vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+
+      /* Fade in animations */
+      .fade-in-up {
+        animation: fadeInUp 0.8s ease forwards;
+        opacity: 0;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .results-content > * {
+        opacity: 0;
+      }
+
+      .results-content {
+        max-width: 900px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .total-score-display {
+        margin-bottom: 60px;
+      }
+
+      .total-score-display h2 {
+        font-family: "GT Alpina", serif;
+        font-weight: 300;
+        font-size: 1.5em;
+        margin-bottom: 20px;
+        color: white;
+        opacity: 0.9;
+      }
+
+      .total-score {
+        font-size: 5em;
+        font-weight: 300;
+        margin-bottom: 10px;
+      }
+
+      .score-label {
+        font-size: 1.2em;
+        opacity: 0.8;
+      }
+
+      .section-scores {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        margin-bottom: 50px;
+      }
+
+      .section-score-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 40px 30px;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .section-score-card h3 {
+        font-family: "GT Alpina", serif;
+        font-weight: 300;
+        font-size: 1.3em;
+        margin-bottom: 20px;
+        color: white;
+      }
+
+      .section-score-value {
+        font-size: 2.5em;
+        margin-bottom: 15px;
+      }
+
+      .section-feedback {
+        font-size: 0.9em;
+        opacity: 0.8;
+        line-height: 1.5;
+      }
+
+      .feedback-section {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 40px;
+        border-radius: 15px;
+        margin-bottom: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .feedback-section h3 {
+        font-family: "GT Alpina", serif;
+        font-weight: 300;
+        font-size: 1.8em;
+        margin-bottom: 20px;
+        color: white;
+      }
+
+      .feedback-section p {
+        font-size: 1.1em;
+        line-height: 1.7;
+        opacity: 0.9;
+      }
+
+      .restart-btn {
+        padding: 18px 50px;
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+        border-radius: 30px;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Helvetica Now Text", "Helvetica Neue", Helvetica, Arial,
+          sans-serif;
+      }
+
+      .restart-btn:hover {
+        background: white;
+        color: #708356;
+      }
+
+      .results-actions {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 40px;
+      }
+
+      .download-pdf-btn {
+        padding: 18px 50px;
+        background: #2b72cf;
+        color: white;
+        border: 2px solid #2b72cf;
+        border-radius: 30px;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Helvetica Now Text", "Helvetica Neue", Helvetica, Arial,
+          sans-serif;
+      }
+
+      .download-pdf-btn:hover {
+        background: #1e5ba8;
+        border-color: #1e5ba8;
+        transform: translateY(-2px);
+      }
+
+      /* Mobile Responsive */
+      @media (max-width: 768px) {
+        .question-text {
+          font-size: 1.8em;
+        }
+
+        .welcome-screen h1 {
+          font-size: 2.5em;
+        }
+
+        .welcome-screen p {
+          font-size: 1.1em;
+        }
+
+        .corner-decoration.top-left {
+          width: 200px;
+          height: 200px;
+        }
+
+        .corner-decoration.bottom-right {
+          width: 180px;
+          height: 130px;
+        }
+
+        .question-screen {
+          padding: 60px 20px 20px;
+        }
+
+        .options {
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .option {
+          width: 60px;
+          height: 60px;
+          font-size: 0.9em;
+        }
+
+        .option-label {
+          font-size: 0.75em;
+          max-width: 140px;
+        }
+
+        .navigation {
+          flex-direction: column;
+          width: 100%;
+        }
+
+        .nav-btn {
+          width: 100%;
+        }
+
+        .section-scores {
+          grid-template-columns: 1fr;
+        }
+
+        .total-score {
+          font-size: 3.5em;
+        }
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      /* Mobile Responsive Styles */
+      @media screen and (max-width: 768px) {
+        .welcome-screen h1 {
+          font-size: 2.5em;
+        }
+
+        .welcome-screen p {
+          font-size: 1em;
+        }
+
+        .start-btn {
+          padding: 15px 35px;
+          font-size: 1em;
+        }
+
+        .corner-decoration.top-left,
+        .corner-decoration.bottom-right {
+          width: 200px;
+          height: 200px;
+        }
+
+        .question-screen {
+          padding: 60px 20px 20px;
+        }
+
+        .section-title-screen {
+          padding: 60px 20px 20px;
+        }
+
+        .section-title {
+          font-size: 2.2em;
+        }
+
+        .section-description {
+          font-size: 1.1em;
+          margin-bottom: 40px;
+        }
+
+        .start-section-btn {
+          padding: 15px 35px;
+          font-size: 1em;
+        }
+
+        .question-text {
+          font-size: 1.8em;
+          margin-bottom: 40px;
+        }
+
+        .options {
+          flex-wrap: nowrap;
+          gap: 8px;
+          margin-bottom: 60px;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          padding: 10px 5px;
+        }
+
+        .option {
+          width: 65px;
+          height: 65px;
+          min-width: 65px;
+          min-height: 65px;
+          max-width: 65px;
+          max-height: 65px;
+          font-size: 0.9em;
+        }
+
+        .option-label {
+          font-size: 0.75em;
+          max-width: 150px;
+        }
+
+        .navigation {
+          flex-direction: column;
+          gap: 15px;
+          margin-top: 30px;
+        }
+
+        .nav-btn {
+          width: 100%;
+          padding: 15px 30px;
+        }
+
+        .results-screen {
+          padding: 60px 20px 40px;
+        }
+
+        .results-content h1 {
+          font-size: 2.5em;
+        }
+
+        .score-breakdown {
+          flex-direction: column;
+        }
+
+        .score-item {
+          padding: 20px;
+        }
+
+        .section-label {
+          font-size: 0.85em;
+          margin-bottom: 30px;
+        }
+      }
+
+      @media screen and (max-width: 480px) {
+        .welcome-screen h1 {
+          font-size: 2em;
+        }
+
+        .welcome-screen p {
+          font-size: 0.9em;
+        }
+
+        .start-btn {
+          padding: 12px 30px;
+          font-size: 0.95em;
+        }
+
+        .corner-decoration.top-left,
+        .corner-decoration.bottom-right {
+          width: 150px;
+          height: 150px;
+        }
+
+        .question-screen {
+          padding: 50px 15px 15px;
+        }
+
+        .question-text {
+          font-size: 1.5em;
+          margin-bottom: 30px;
+        }
+
+        .options {
+          gap: 5px;
+          margin-bottom: 50px;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          padding: 10px 2px;
+        }
+
+        .option {
+          width: 50px;
+          height: 50px;
+          min-width: 50px;
+          min-height: 50px;
+          max-width: 50px;
+          max-height: 50px;
+          font-size: 0.8em;
+        }
+
+        .option-label {
+          font-size: 0.7em;
+          max-width: 120px;
+          gap: 15px;
+        }
+
+        .option-wrapper {
+          gap: 15px;
+        }
+
+        .nav-btn {
+          padding: 12px 25px;
+          font-size: 0.9em;
+        }
+
+        .results-content h1 {
+          font-size: 2em;
+        }
+
+        .results-content h2 {
+          font-size: 1.3em;
+        }
+
+        .score-item h3 {
+          font-size: 1em;
+        }
+
+        .section-label {
+          font-size: 0.8em;
+          margin-bottom: 25px;
+        }
+
+        .results-actions {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .restart-btn,
+        .download-pdf-btn {
+          padding: 15px 35px;
+          font-size: 1em;
+        }
+      }
+
+      /* Touch-friendly improvements */
+      @media (hover: none) and (pointer: coarse) {
+        .option {
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .option:active {
+          transform: scale(0.95);
+        }
+
+        .nav-btn:active {
+          transform: scale(0.98);
+        }
+
+        .start-btn:active {
+          transform: scale(0.98);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressBar"></div>
+    </div>
+
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+      <!-- Top Left Decoration - Organic Curved Element -->
+      <svg
+        class="corner-decoration top-left"
+        viewBox="0 0 389 389"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g clip-path="url(#clip0_1405_933)">
+          <path
+            d="M284.128 -77.3843C284.388 -77.4962 284.416 -76.6195 284.212 -75.4137C284.001 -74.1651 283.853 -73.1617 283.725 -72.2496C283.718 -72.1937 283.71 -72.1374 283.702 -72.0815C283.575 -71.16 283.463 -70.2819 283.336 -69.3327C283.294 -69.0149 283.249 -68.6867 283.209 -68.3795C283.14 -67.8261 283.071 -67.1935 282.995 -66.4329C282.98 -66.2802 282.964 -66.1223 282.949 -65.961C282.849 -64.9255 282.741 -63.7138 282.625 -62.3365C282.351 -59.0537 282.038 -55.1156 281.669 -49.7082C281.573 -48.2898 281.495 -46.9034 281.431 -45.5412C281.142 -39.3365 281.091 -33.9114 281.031 -27.8018C281.022 -26.9942 281.009 -26.2165 280.998 -25.3825C280.971 -22.9067 280.933 -19.9523 281.254 -14.101C281.7 -6.37632 282.735 6.27766 286.385 28.5143C287.004 32.2797 287.65 36.41 288.357 40.7658C288.624 42.4168 288.904 44.1129 289.195 45.8471C290.259 52.1945 291.53 59.2858 293.166 67.3148C295.17 77.1515 296.628 83.6132 297.833 89.025C297.875 89.2116 297.916 89.3986 297.958 89.5852C298.01 89.817 298.061 90.0473 298.112 90.2755C299.893 98.2631 302.18 110.576 303.254 119.714C303.928 125.433 304.544 130.139 305.295 136.198C305.66 139.168 306.146 142.324 306.833 147.15C307.025 148.509 307.236 150.03 307.459 151.701C308.43 159.188 309.804 169.679 310.594 185.767C310.791 190.008 310.938 193.794 311.025 197.309C311.052 198.402 311.073 199.468 311.087 200.518C311.15 204.986 311.095 209.106 310.845 212.909C310.643 215.968 310.194 223.088 309.342 230.716C308.506 238.481 307.205 246.656 306.229 252.55C306.129 253.166 306.025 253.787 305.917 254.405C304.993 259.744 303.787 265.01 302.773 269.427C300.264 289.705 277.781 321.643 257.106 334.281C256.85 334.46 256.593 334.639 256.335 334.818C236.278 348.457 219.14 353.895 210.338 356.906C208.941 357.361 207.758 357.697 206.816 357.949C206.491 358.036 206.195 358.113 205.928 358.181C205.691 358.241 205.476 358.295 205.285 358.341C202.465 359.026 199.899 359.515 197.277 359.903C197.133 359.924 196.988 359.945 196.844 359.966C194.033 360.361 191.119 360.644 187.63 360.757C174.791 361.086 164.585 359.587 155.925 358.223C154.332 357.962 152.778 357.693 151.26 357.419C151.256 357.418 151.251 357.418 151.247 357.417C144.62 356.218 138.789 354.969 133.324 353.728C123.346 351.44 116.679 349.853 111.491 348.697C109.863 348.332 108.361 347.999 106.95 347.691C103.907 347.025 101.22 346.451 98.4938 345.868C93.325 344.763 88.5941 343.869 83.924 343.102C83.5073 343.034 83.0918 342.967 82.6774 342.901C77.6437 342.101 72.6111 341.438 67.392 340.955C66.1644 340.841 65.1722 340.577 65.1636 340.342C65.157 340.109 66.1425 339.993 67.3767 340.106C72.4755 340.575 77.3964 341.213 82.4504 342.008C82.8681 342.074 83.289 342.14 83.7106 342.209C88.388 342.97 93.2097 343.877 98.4842 345.003C101.117 345.565 103.654 346.106 106.643 346.758C108.071 347.069 109.613 347.409 111.331 347.795C116.6 348.967 123.357 350.575 133.421 352.883C138.812 354.108 144.56 355.343 151.16 356.542C152.684 356.818 154.249 357.09 155.857 357.355C164.5 358.724 174.724 360.235 187.529 359.916C190.804 359.811 193.53 359.561 196.309 359.185C196.464 359.164 196.619 359.142 196.774 359.12C199.342 358.753 202.029 358.259 204.971 357.549C205.369 357.452 205.877 357.326 206.485 357.165C207.441 356.911 208.648 356.57 210.077 356.104C218.907 353.087 235.991 347.649 255.915 334.082C255.985 334.034 256.056 333.985 256.126 333.937C271.347 323.203 278.229 314.752 282.966 308.512C286.679 303.455 289.181 299.443 291.125 296.158C291.495 295.53 291.839 294.931 292.164 294.36C293.569 291.878 294.608 289.873 295.559 287.834C298.41 281.642 299.94 277.017 301.347 271.325C302.543 266.464 303.912 260.644 304.844 255.447C304.845 255.439 304.847 255.431 304.849 255.423C304.96 254.807 305.067 254.199 305.168 253.604C306.328 246.907 307.709 238.128 308.538 230.285C309.4 222.456 309.84 215.157 310.045 211.852C310.248 208.566 310.305 204.885 310.243 200.451C310.229 199.459 310.209 198.429 310.182 197.361C310.095 193.835 309.943 189.886 309.736 185.514C308.946 169.646 307.596 159.319 306.645 151.976C306.443 150.462 306.247 149.05 306.061 147.729C306.061 147.727 306.06 147.724 306.06 147.722C305.364 142.804 304.8 139.12 304.378 135.711C303.619 129.618 302.974 124.719 302.263 118.737C301.284 110.467 299.148 98.9029 297.478 91.4058C297.387 90.9948 297.294 90.5741 297.199 90.1488C295.989 84.7108 294.492 78.0752 292.439 68.0071C290.744 59.6869 289.431 52.3666 288.349 45.9148C288.039 44.0672 287.751 42.307 287.478 40.6213C286.783 36.3276 286.179 32.4587 285.587 28.8659C281.906 6.4791 280.829 -6.49129 280.372 -14.6386C280.033 -20.9751 280.094 -24.4289 280.133 -26.9208C280.147 -27.6669 280.162 -28.3472 280.17 -28.9935C280.251 -34.7631 280.304 -39.7826 280.603 -46.0174C280.672 -47.4075 280.755 -48.8443 280.86 -50.333C281.213 -55.3146 281.493 -58.8781 281.731 -61.8503C281.835 -63.1249 281.929 -64.2391 282.025 -65.2849C282.027 -65.3041 282.029 -65.3239 282.031 -65.3431C282.044 -65.4889 282.057 -65.634 282.071 -65.7774C282.081 -65.8854 282.091 -65.9931 282.101 -66.1009C282.103 -66.1437 282.105 -66.1821 282.106 -66.2108C282.107 -66.2329 282.108 -66.2506 282.108 -66.2619C282.108 -66.2641 282.109 -66.2668 282.109 -66.269C282.119 -66.4747 282.135 -66.6511 282.138 -66.6872C282.144 -66.7499 282.15 -66.8054 282.153 -66.8338C282.169 -66.9842 282.193 -67.1775 282.209 -67.3058C282.251 -67.6353 282.324 -68.2082 282.448 -69.087C282.548 -69.8534 282.639 -70.5881 282.76 -71.5019C282.768 -71.5593 282.776 -71.617 282.783 -71.6743C282.899 -72.5438 283.059 -73.6546 283.278 -74.9851C283.479 -76.2027 283.868 -77.2711 284.128 -77.3843ZM3.28365 356.538C8.24534 351.357 13.788 346.715 19.9584 343.048C81.2109 314.84 144.709 368.065 208.679 351.8C215.537 349.578 221.883 347.159 227.966 344.455C244.992 336.632 251.259 332.37 258.826 326.549C260.66 325.079 262.531 323.502 264.536 321.692C288.497 300.775 297.105 270.966 299.169 261.035C299.498 259.598 299.726 258.511 299.868 257.84C300.121 256.641 300.544 255.482 300.83 255.259C301.115 255.039 301.16 255.847 300.913 257.057C300.782 257.696 300.569 258.748 300.259 260.153C298.292 269.988 289.8 300.631 265.38 322.069C263.387 323.879 261.522 325.462 259.688 326.941C252.061 332.854 246.052 338.213 228.626 346.203C222.522 348.913 216.131 351.34 209.249 353.554C143.608 369.785 80.9317 315.959 20.3973 343.799C14.392 347.351 8.97522 351.851 4.11385 356.896C-11.2763 373.031 -21.556 393.257 -32.9394 412.762C-41.5454 429.567 -63.7284 457.161 -71.8627 460.6C-72.9374 461.336 -73.9247 461.73 -74.0378 461.527C-74.1504 461.322 -73.3619 460.605 -72.304 459.88C-64.3529 456.534 -42.3553 429.256 -33.769 412.509C-22.4101 393.062 -12.1496 372.827 3.28365 356.538ZM280.724 -100.419C281.233 -101.612 281.802 -102.401 281.951 -102.162C282.098 -101.917 281.789 -100.765 281.289 -99.5744C280.423 -97.5121 279.85 -96.0386 279.363 -94.7533C279.309 -94.6107 279.257 -94.4675 279.203 -94.3246C278.697 -92.9611 278.27 -91.7559 277.729 -90.0326C276.958 -87.4934 276.505 -85.722 276.087 -84.015C275.077 -79.5863 274.116 -76.1028 272.325 -65.0806C270.634 -54.2661 268.964 -31.8893 273.405 4.61082C274.59 14.7246 276.623 28.8231 278.982 42.8924C279.009 43.0562 279.037 43.22 279.064 43.3839C281.43 57.5516 284.022 71.695 285.859 81.7832C292.96 121.055 300.773 159.528 301.32 199.086C301.542 206.397 301.481 212.98 301.217 219.097C300.41 237.045 298.003 250.723 294.828 263.25C294.076 266.04 292.118 273.244 287.506 283.009C286.153 285.853 284.546 288.932 282.655 292.126C278.016 299.987 271.425 308.809 262.485 317.085C260.609 318.824 258.852 320.348 257.122 321.774C249.828 327.542 243.948 332.268 227.346 340.042C221.726 342.589 215.202 345.175 207.345 347.698C188.512 353.884 164.291 349.614 150.066 346.759C140.122 344.705 134.512 343.253 130.545 342.279C129.441 342.003 128.469 341.758 127.576 341.532C125.242 340.941 123.435 340.479 121.052 339.891C103.869 335.752 91.7648 332.536 71.1209 330.253C69.8265 330.125 68.7301 329.843 68.6429 329.602C68.5707 329.362 69.5597 329.251 70.8579 329.376C91.6307 331.633 103.938 334.9 121.357 339.097C123.845 339.711 125.778 340.204 128.153 340.805C129.033 341.028 129.971 341.265 131.017 341.526C134.916 342.483 140.462 343.916 150.33 345.952C164.496 348.8 188.587 352.989 207.085 346.895C214.891 344.389 221.376 341.819 226.945 339.297C243.31 331.64 249.055 327.044 256.272 321.375C258.002 319.96 259.763 318.443 261.649 316.704C270.554 308.514 277.144 299.751 281.771 291.956C283.655 288.795 285.253 285.753 286.599 282.944C291.284 273.06 293.08 266.321 293.75 263.957C297.117 251.083 299.595 236.889 300.382 218.826C300.637 212.804 300.692 206.37 300.482 199.308C298.459 160.202 291.19 120.838 285.033 81.9498C283.192 71.8389 280.594 57.6725 278.228 43.5038C278.201 43.3443 278.176 43.1845 278.149 43.0251C275.787 28.9349 273.755 14.8366 272.57 4.72663C268.134 -31.5943 269.744 -54.6413 271.615 -66.1058C273.385 -76.6423 274.246 -79.7234 275.219 -84.0214C275.248 -84.1389 275.277 -84.2563 275.306 -84.3737C275.307 -84.3816 275.308 -84.3898 275.309 -84.3977C275.334 -84.548 275.359 -84.6735 275.372 -84.7379C275.399 -84.8692 275.423 -84.9756 275.432 -85.0154C275.453 -85.1073 275.473 -85.1842 275.479 -85.2115C275.507 -85.323 275.539 -85.4503 275.56 -85.5324C275.755 -86.2998 276.401 -88.6599 277.016 -90.591C277.636 -92.5454 278.132 -93.9136 278.673 -95.343C278.728 -95.4873 278.783 -95.6314 278.839 -95.7754C279.335 -97.0593 279.886 -98.449 280.724 -100.419ZM-0.00785561 368.121C5.64713 360.878 12.2623 353.625 22.5552 347.49C24.2118 346.52 25.9704 345.623 27.8678 344.801C29.0983 344.267 30.3889 343.766 31.7298 343.306C32.8151 342.933 33.7879 342.841 33.8794 343.056C33.9703 343.273 33.1574 343.709 32.0892 344.075C30.7965 344.516 29.5522 344.996 28.3679 345.504C28.3626 345.507 28.3569 345.509 28.3515 345.511C26.423 346.34 24.6472 347.244 22.9812 348.219C12.886 354.244 6.49942 361.237 1.00739 368.201C-2.47633 372.359 -12.2423 387.006 -24.1124 407.215C-27.6687 413.106 -30.3495 417.445 -32.5823 420.945C-32.8261 421.327 -33.0644 421.699 -33.2969 422.061C-33.3023 422.069 -33.3076 422.078 -33.313 422.086C-35.2118 425.043 -36.7416 427.351 -38.253 429.613C-38.2849 429.661 -38.3163 429.709 -38.3482 429.757C-42.2404 435.606 -47.0322 442.844 -51.6271 448.171C-52.4987 449.191 -53.3568 449.865 -53.522 449.701C-53.6868 449.536 -53.1031 448.601 -52.2394 447.589C-47.5356 442.131 -42.7018 434.784 -38.872 429.013C-38.8181 428.932 -38.7633 428.852 -38.7095 428.771C-37.1374 426.41 -35.5536 424.005 -33.6779 421.074C-33.4402 420.703 -33.1969 420.321 -32.9491 419.931C-30.7378 416.454 -28.0965 412.174 -24.5787 406.347C-12.9908 386.643 -3.41681 372.242 -0.00785561 368.121ZM0.12428 351.707C1.05699 350.756 2.01781 350.093 2.24852 350.195C2.47573 350.301 1.8876 351.126 0.960993 352.064C-3.92696 357.04 -6.9911 360.983 -9.3306 364.044C-13.6154 369.77 -15.4754 372.672 -18.2911 376.949C-25.4955 388.052 -31.5666 399.15 -37.2283 408.905C-46.4907 425.219 -55.1899 437.496 -60.492 443.259C-61.3079 444.179 -62.1236 444.776 -62.285 444.608C-62.4474 444.44 -61.9024 443.58 -61.0962 442.67C-55.8786 436.991 -47.2797 424.886 -38.056 408.653C-32.3903 398.898 -26.3024 387.753 -19.0324 376.54C-16.2921 372.375 -14.5353 369.625 -10.3459 363.984C-8.00326 360.898 -4.91646 356.875 0.12428 351.707ZM299.129 -121.88C300.688 -123.451 298.8 -120.208 296.385 -117.02C296.299 -116.904 296.213 -116.787 296.127 -116.67C295.31 -115.558 294.614 -114.57 293.694 -113.14C292.383 -111.053 291.497 -109.453 290.711 -107.975C287.623 -104.533 278.155 -75.1985 277.513 -64.1903C275.882 -53.6771 274.843 -31.8767 279.253 4.22926C280.43 14.2291 282.051 28.2027 284.608 42.2082C284.615 42.2459 284.622 42.2837 284.629 42.3215C287.142 56.1501 289.906 70.1203 291.76 80.2944C293.637 90.5702 294.609 97.0018 295.521 103.215C295.53 103.276 295.539 103.337 295.548 103.397C296.434 109.472 297.3 115.396 298.831 124.83C299.867 131.247 301.099 139.36 302.219 147.881C304.571 165.346 306.238 185.218 306.581 199.243C306.618 200.488 306.453 201.592 306.221 201.651C305.989 201.715 305.78 200.703 305.744 199.464C305.41 185.359 303.715 165.24 301.346 147.724C300.231 139.264 299.015 131.254 298.001 124.981C296.413 115.191 295.503 108.987 294.607 102.857C294.597 102.791 294.587 102.724 294.577 102.659C293.675 96.5275 292.743 90.3789 290.932 80.462C289.11 70.4552 286.37 56.6197 283.833 42.6764C283.831 42.6656 283.83 42.6549 283.828 42.644C281.28 28.7144 278.591 14.5861 277.388 4.35207C272.985 -31.6785 274.998 -54.0871 276.798 -65.1912C279.676 -84.4832 285.661 -106.812 299.129 -121.88ZM287.147 -92.1652C287.547 -93.321 288.064 -94.1706 288.279 -94.0816C288.493 -93.9896 288.326 -92.9991 287.93 -91.8521C286.99 -89.1395 286.119 -86.2416 285.401 -83.5099C285.094 -82.3444 284.682 -81.439 284.457 -81.503C284.234 -81.5684 284.286 -82.5881 284.596 -83.7636C285.319 -86.5125 286.199 -89.433 287.147 -92.1652Z"
+            fill="white"
+          />
+        </g>
+        <defs>
+          <clipPath id="clip0_1405_933">
+            <rect width="389" height="389" fill="white" />
+          </clipPath>
+        </defs>
+      </svg>
+
+      <!-- Bottom Right Decoration - Dashed Arc -->
+      <svg
+        class="corner-decoration bottom-right"
+        viewBox="0 0 389 389"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g clip-path="url(#clip0_1405_936)">
+          <path
+            d="M22.0211 437.953L16.7896 442.952C12.806 446.759 8.49616 450.219 3.8287 453.285L-4.11857 441.191C-0.21207 438.624 3.41534 435.717 6.79159 432.49L12.0221 427.49L22.0211 437.953ZM51.8746 381.15L49.4996 387.985C45.8901 398.371 41.648 408.162 36.564 417.113L32.9908 423.405L20.4068 416.258L23.981 409.966C28.5413 401.937 32.4425 392.98 35.8297 383.234L38.2047 376.399L51.8746 381.15ZM65.2633 320.291L64.0562 327.426C62.2966 337.824 60.3353 348.007 58.0553 357.834L56.4205 364.883L42.3228 361.612L43.9586 354.564C46.156 345.092 48.0614 335.206 49.7867 325.011L50.9947 317.877L65.2633 320.291ZM73.6676 259.449L72.7232 266.623C71.3872 276.769 70.0658 286.945 68.6734 296.989L67.6803 304.156L53.3453 302.17L54.3394 295.002C55.723 285.021 57.0346 274.917 58.3756 264.734L59.3199 257.56L73.6676 259.449ZM83.0182 199.388L81.7164 206.506C79.9237 216.307 78.3373 226.308 76.8619 236.42L75.817 243.58L61.4967 241.491L62.5416 234.331C64.0334 224.107 65.6479 213.925 67.481 203.903L68.7828 196.784L83.0182 199.388ZM98.9908 141.667L96.5435 148.477C93.2818 157.553 90.4658 167.119 87.9879 177.065L86.2389 184.085L72.1959 180.587L73.9459 173.566C76.5172 163.245 79.4674 153.202 82.9244 143.582L85.3717 136.773L98.9908 141.667ZM129.673 92.381L124.885 97.8068C118.656 104.866 113.223 112.831 108.452 121.576L104.986 127.929L92.2818 120.997L95.7467 114.646C100.959 105.091 106.993 96.2104 114.035 88.2306L118.823 82.8058L129.673 92.381ZM406.12 113.902L399.624 117.09C393.831 119.933 387.744 122.192 381.319 123.593C375.727 124.812 370.111 125.162 364.515 124.825L357.293 124.39L358.163 109.945L365.385 110.379C369.792 110.644 374.069 110.362 378.236 109.453C383.349 108.338 388.332 106.511 393.248 104.099L399.744 100.91L406.12 113.902ZM313.308 90.3947C322.091 95.4895 330.65 100.05 339.006 103.544L345.682 106.335L340.1 119.688L333.423 116.896C324.235 113.054 315.063 108.143 306.046 102.912L299.788 99.2814L307.049 86.7639L313.308 90.3947ZM462.215 67.5861L456.776 72.3586C448.397 79.7109 439.129 88.4858 430.23 96.0373L424.712 100.719L415.349 89.6838L420.866 85.0021C429.881 77.352 438.022 69.5606 447.231 61.4806L452.67 56.7082L462.215 67.5861ZM261.408 60.132C270.275 64.575 279.153 69.7812 287.882 75.0627L294.073 78.8088L286.582 91.1906L280.39 87.4445C271.728 82.2037 263.255 77.2442 254.925 73.0705L248.456 69.8293L254.939 56.8908L261.408 60.132ZM179.223 65.298L172.303 67.4152C162.635 70.3724 154.063 74.3705 146.424 79.2541L140.329 83.1515L132.533 70.9592L138.629 67.0607C147.407 61.4492 157.182 56.9069 168.071 53.5764L174.99 51.4592L179.223 65.298ZM215.593 47.0412C221.086 47.0417 226.558 47.7519 231.974 48.9865L239.03 50.5949L235.813 64.7053L228.758 63.0969C224.222 62.0629 219.838 61.5133 215.592 61.5129C210.449 61.5124 205.521 61.7148 200.799 62.1086L193.588 62.7101L192.385 48.2883L199.596 47.6867C204.739 47.2578 210.069 47.0406 215.593 47.0412ZM498.664 46.216C493.705 47.5141 488.824 49.5657 483.947 52.2424L477.604 55.7238L470.641 43.0373L476.984 39.5558C482.688 36.4253 488.676 33.871 494.998 32.216L498.664 46.216Z"
+            fill="white"
+          />
+        </g>
+        <defs>
+          <clipPath id="clip0_1405_936">
+            <rect width="389" height="389" fill="white" />
+          </clipPath>
+        </defs>
+      </svg>
+
+      <div class="welcome-content">
+        <h1>Career Assessment Quiz</h1>
+        <p>
+          Discover your career alignment and areas for growth through 12
+          thoughtful questions
+        </p>
+        <button class="start-btn" onclick="startQuiz()">
+          Start Assessment
+        </button>
+      </div>
+    </div>
+
+    <!-- Question Screens -->
+    <div id="questionContainer"></div>
+
+    <!-- Results Screen -->
+    <div class="results-screen" id="resultsScreen">
+      <div class="results-content">
+        <div class="total-score-display">
+          <h2>Your Total Score</h2>
+          <div class="total-score" id="totalScore">0</div>
+          <div class="score-label">out of 120</div>
+        </div>
+
+        <div class="section-scores">
+          <div class="section-score-card">
+            <h3>Career Direction & Alignment</h3>
+            <div class="section-score-value" id="section1Score">0</div>
+            <div class="section-feedback" id="section1Feedback"></div>
+          </div>
+          <div class="section-score-card">
+            <h3>Barriers & Self-Belief</h3>
+            <div class="section-score-value" id="section2Score">0</div>
+            <div class="section-feedback" id="section2Feedback"></div>
+          </div>
+          <div class="section-score-card">
+            <h3>Skills & Development</h3>
+            <div class="section-score-value" id="section3Score">0</div>
+            <div class="section-feedback" id="section3Feedback"></div>
+          </div>
+        </div>
+
+        <div class="feedback-section">
+          <h3>How might coaching help you?</h3>
+          <p id="overallFeedback"></p>
+        </div>
+
+        <div class="results-actions">
+          <button class="download-pdf-btn" onclick="downloadPDF()">
+            Download Results PDF
+          </button>
+          <button class="restart-btn" onclick="restartQuiz()">
+            Take Quiz Again
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const questions = [
+        {
+          section: "Career Direction & Alignment",
+          question: "How much do you enjoy your current job?",
+          options: [
+            {
+              value: 1,
+              label: "I do not enjoy my role nor feel it's right for me",
+            },
+            { value: 5, label: "It pays the bills but I question it" },
+            { value: 10, label: "I love it! I skip to work every morning" },
+          ],
+        },
+        {
+          section: "Career Direction & Alignment",
+          question:
+            "Are you clear on your career path and know what steps you'll take?",
+          options: [
+            { value: 1, label: "I have no idea what the future holds" },
+            { value: 5, label: "I have a rough idea but I'm making it up" },
+            { value: 10, label: "For sure, I'm clear until I retire!" },
+          ],
+        },
+        {
+          section: "Career Direction & Alignment",
+          question: "Do you live your life in line with your values?",
+          options: [
+            { value: 1, label: "What do you even mean by values?" },
+            {
+              value: 5,
+              label: "Not intentionally, I'm not clear on what they are",
+            },
+            {
+              value: 10,
+              label: "Yes, I'm clear on them and prioritise accordingly",
+            },
+          ],
+        },
+        {
+          section: "Career Direction & Alignment",
+          question: "How would you describe your work-life balance?",
+          options: [
+            { value: 1, label: "Terrible, I'm close to burnout" },
+            {
+              value: 5,
+              label: "It's OK but sometimes I get pulled in too far",
+            },
+            { value: 10, label: "Wonderful, I have time for everything" },
+          ],
+        },
+        {
+          section: "Barriers & Self-Belief",
+          question:
+            "How confident do you feel in intimidating work situations?",
+          options: [
+            { value: 1, label: "Avoid at all costs!" },
+            { value: 5, label: "I get nervous but manage fine" },
+            { value: 10, label: "Highly confident, nothing phases me" },
+          ],
+        },
+        {
+          section: "Barriers & Self-Belief",
+          question: "How confident do you feel in your ability to do your job?",
+          options: [
+            {
+              value: 1,
+              label: "Not confident, I'm struggling with imposter syndrome",
+            },
+            { value: 5, label: "I sometimes question myself" },
+            { value: 10, label: "Very, they are lucky to have me!" },
+          ],
+        },
+        {
+          section: "Barriers & Self-Belief",
+          question: "Do you find it easy to concentrate and get things done?",
+          options: [
+            {
+              value: 1,
+              label: "No! I struggle to concentrate and procrastinate",
+            },
+            { value: 5, label: "Generally, but I get distracted" },
+            { value: 10, label: "Very, I'm incredibly efficient" },
+          ],
+        },
+        {
+          section: "Barriers & Self-Belief",
+          question: "Do you find any specific work relationships challenging?",
+          options: [
+            {
+              value: 1,
+              label: "Yes, it's affecting my wellbeing and/or performance",
+            },
+            { value: 5, label: "Sometimes, I could do with some tips" },
+            { value: 10, label: "Not at all, I get on with everyone" },
+          ],
+        },
+        {
+          section: "Skills & Development",
+          question: "Can you clearly articulate your strengths and weaknesses?",
+          options: [
+            { value: 1, label: "Not really, I've never thought about it" },
+            { value: 5, label: "Kind of but I haven't mapped them out" },
+            { value: 10, label: "Yes, I know and own them" },
+          ],
+        },
+        {
+          section: "Skills & Development",
+          question: "How well do you influence decision-makers?",
+          options: [
+            { value: 1, label: "Not well at all, I often feel overlooked" },
+            { value: 5, label: "OK, but I could be stronger" },
+            { value: 10, label: "Very well, this is a clear strength" },
+          ],
+        },
+        {
+          section: "Skills & Development",
+          question: "How good at managing people are you?",
+          options: [
+            { value: 1, label: "I struggle with this and need guidance" },
+            { value: 5, label: "I'm doing fine but could develop further" },
+            { value: 10, label: "People respect me; I get great feedback" },
+          ],
+        },
+        {
+          section: "Skills & Development",
+          question: "Are you hitting your performance goals?",
+          options: [
+            { value: 1, label: "No, I'm falling behind and need support" },
+            { value: 5, label: "Mostly, but I lack clarity at times" },
+            { value: 10, label: "Yes, I consistently deliver" },
+          ],
+        },
+      ];
+
+      let currentQuestion = 0;
+      const answers = {};
+
+      function startQuiz() {
+        document.getElementById("welcomeScreen").classList.add("hidden");
+        renderQuestions();
+        // Show the first section title screen
+        document.getElementById("section-title-0").classList.add("active");
+        updateProgress();
+      }
+
+      function renderQuestions() {
+        const container = document.getElementById("questionContainer");
+        let questionIndex = 0;
+
+        // Track sections to add title pages
+        const sections = [];
+        const sectionTitles = {
+          "Career Direction & Alignment": "Career Direction & Alignment",
+          "Barriers & Self-Belief": "Barriers & Self-Belief",
+          "Skills & Development": "Skills & Development",
+        };
+
+        const sectionDescriptions = {
+          "Career Direction & Alignment":
+            "Let's start by understanding your current career satisfaction and direction.",
+          "Barriers & Self-Belief":
+            "We all hit moments of doubt. This section looks at what might be holding you back.",
+          "Skills & Development":
+            "What does growth look like for you? Where might you stretch further?",
+        };
+
+        questions.forEach((q, index) => {
+          // Check if this is a new section
+          if (!sections.includes(q.section)) {
+            sections.push(q.section);
+
+            // Add section title page
+            const titleDiv = document.createElement("div");
+            titleDiv.className = "section-title-screen";
+            titleDiv.id = `section-title-${sections.length - 1}`;
+
+            // Add section-specific class for styling
+            if (q.section === "Barriers & Self-Belief") {
+              titleDiv.classList.add("section-2");
+            } else if (q.section === "Skills & Development") {
+              titleDiv.classList.add("section-3");
+            }
+
+            titleDiv.innerHTML = `
+              <div class="section-title-content">
+                <h2 class="section-title">${sectionTitles[q.section]}</h2>
+                <p class="section-description">${
+                  sectionDescriptions[q.section]
+                }</p>
+                <button class="start-section-btn" onclick="startSection(${
+                  sections.length - 1
+                })">
+                  Start Section
+                </button>
+              </div>
+            `;
+
+            container.appendChild(titleDiv);
+          }
+
+          // Add the actual question
+          const questionDiv = document.createElement("div");
+          questionDiv.className = "question-screen";
+          questionDiv.id = `question-${questionIndex}`;
+
+          // Add section-specific class for styling
+          if (q.section === "Barriers & Self-Belief") {
+            questionDiv.classList.add("section-2");
+          } else if (q.section === "Skills & Development") {
+            questionDiv.classList.add("section-3");
+          }
+
+          questionDiv.innerHTML = `
+            <div class="question-content">
+              <div class="section-label">${q.section}</div>
+              <div class="question-number">Question ${questionIndex + 1} of ${
+            questions.length
+          }</div>
+              <div class="question-text">${q.question}</div>
+              <div class="options">
+                ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                  .map((num) => {
+                    const hasLabel = q.options.find((opt) => opt.value === num);
+                    const showLabel =
+                      (num === 1 || num === 5 || num === 10) && hasLabel;
+
+                    if (showLabel) {
+                      return `
+                      <div class="option-wrapper">
+                        <div class="option" data-value="${num}" onclick="selectOption(${questionIndex}, ${num})">
+                          ${num}
+                        </div>
+                        <div class="option-label">${hasLabel.label}</div>
+                      </div>
+                    `;
+                    } else {
+                      return `
+                      <div class="option" data-value="${num}" onclick="selectOption(${questionIndex}, ${num})">
+                        ${num}
+                      </div>
+                    `;
+                    }
+                  })
+                  .join("")}
+              </div>
+              <div class="navigation">
+                ${
+                  questionIndex > 0
+                    ? '<button class="nav-btn" onclick="previousQuestion()">Back</button>'
+                    : ""
+                }
+                <button class="nav-btn primary" id="next-${questionIndex}" onclick="nextQuestion()" ${
+            !answers[questionIndex] ? "disabled" : ""
+          }>
+                  ${
+                    questionIndex === questions.length - 1
+                      ? "View Results"
+                      : "Next"
+                  }
+                </button>
+              </div>
+            </div>
+          `;
+
+          container.appendChild(questionDiv);
+          questionIndex++;
+        });
+      }
+
+      function startSection(sectionIndex) {
+        // Hide all screens
+        document
+          .querySelectorAll(".section-title-screen, .question-screen")
+          .forEach((screen) => screen.classList.remove("active"));
+
+        // Find the first question of this section
+        const sections = [];
+        let questionIndex = 0;
+
+        questions.forEach((q) => {
+          if (!sections.includes(q.section)) {
+            sections.push(q.section);
+            if (sections.length - 1 === sectionIndex) {
+              showQuestion(questionIndex);
+              return;
+            }
+          }
+          questionIndex++;
+        });
+      }
+
+      function showQuestion(index) {
+        document
+          .querySelectorAll(".section-title-screen, .question-screen")
+          .forEach((screen) => screen.classList.remove("active"));
+        document.getElementById(`question-${index}`).classList.add("active");
+        currentQuestion = index;
+
+        // Restore selected answer if exists
+        if (answers[index]) {
+          const option = document.querySelector(
+            `#question-${index} .option[data-value="${answers[index]}"]`
+          );
+          if (option) option.classList.add("selected");
+        }
+
+        updateProgress();
+      }
+
+      function selectOption(questionIndex, value) {
+        answers[questionIndex] = value;
+
+        // Update UI
+        const questionDiv = document.getElementById(
+          `question-${questionIndex}`
+        );
+        questionDiv
+          .querySelectorAll(".option")
+          .forEach((opt) => opt.classList.remove("selected"));
+        questionDiv
+          .querySelector(`.option[data-value="${value}"]`)
+          .classList.add("selected");
+
+        // Enable next button
+        const nextBtn = document.getElementById(`next-${questionIndex}`);
+        if (nextBtn) nextBtn.disabled = false;
+      }
+
+      function nextQuestion() {
+        if (currentQuestion < questions.length - 1) {
+          const nextQuestionIndex = currentQuestion + 1;
+          const currentSection = questions[currentQuestion].section;
+          const nextSection = questions[nextQuestionIndex].section;
+
+          // Check if we're moving to a new section
+          if (currentSection !== nextSection) {
+            // Find the section title screen for the next section
+            const sections = [];
+            questions.forEach((q) => {
+              if (!sections.includes(q.section)) {
+                sections.push(q.section);
+              }
+            });
+
+            const nextSectionIndex = sections.indexOf(nextSection);
+            if (nextSectionIndex !== -1) {
+              // Show the section title screen
+              document
+                .querySelectorAll(".section-title-screen, .question-screen")
+                .forEach((screen) => screen.classList.remove("active"));
+              document
+                .getElementById(`section-title-${nextSectionIndex}`)
+                .classList.add("active");
+              return;
+            }
+          }
+
+          showQuestion(nextQuestionIndex);
+        } else {
+          showResults();
+        }
+      }
+
+      function previousQuestion() {
+        if (currentQuestion > 0) {
+          showQuestion(currentQuestion - 1);
+        }
+      }
+
+      function updateProgress() {
+        const progress = (Object.keys(answers).length / questions.length) * 100;
+        document.getElementById("progressBar").style.width = progress + "%";
+      }
+
+      function showResults() {
+        document.getElementById("questionContainer").style.display = "none";
+        document.getElementById("resultsScreen").classList.add("active");
+
+        // Calculate scores
+        const section1 = answers[0] + answers[1] + answers[2] + answers[3];
+        const section2 = answers[4] + answers[5] + answers[6] + answers[7];
+        const section3 = answers[8] + answers[9] + answers[10] + answers[11];
+        const total = section1 + section2 + section3;
+
+        // Display scores
+        document.getElementById("totalScore").textContent = total;
+        document.getElementById("section1Score").textContent = section1 + "/40";
+        document.getElementById("section2Score").textContent = section2 + "/40";
+        document.getElementById("section3Score").textContent = section3 + "/40";
+
+        // Section feedback
+        document.getElementById("section1Feedback").textContent =
+          getSectionFeedback(section1);
+        document.getElementById("section2Feedback").textContent =
+          getSectionFeedback(section2);
+        document.getElementById("section3Feedback").textContent =
+          getSectionFeedback(section3);
+
+        // Overall feedback
+        document.getElementById("overallFeedback").textContent =
+          getOverallFeedback(total);
+
+        // Update progress to 100%
+        document.getElementById("progressBar").style.width = "100%";
+
+        // Trigger confetti animation
+        createConfetti();
+
+        // Animate in content
+        animateResults();
+      }
+
+      function createConfetti() {
+        const colors = [
+          "#708356",
+          "#2b72cf",
+          "#c55e14",
+          "#ffffff",
+          "#FFD700",
+          "#FF69B4",
+        ];
+        const confettiCount = 100;
+        const resultsScreen = document.getElementById("resultsScreen");
+
+        for (let i = 0; i < confettiCount; i++) {
+          setTimeout(() => {
+            const confetti = document.createElement("div");
+            confetti.className = "confetti";
+            confetti.style.left = Math.random() * 100 + "%";
+            confetti.style.background =
+              colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.animationDelay = Math.random() * 0.5 + "s";
+            confetti.style.animationDuration = Math.random() * 2 + 2 + "s";
+            resultsScreen.appendChild(confetti);
+
+            // Remove confetti after animation
+            setTimeout(() => confetti.remove(), 5000);
+          }, i * 30);
+        }
+      }
+
+      function animateResults() {
+        const elements = document.querySelectorAll(".results-content > *");
+        elements.forEach((el, index) => {
+          setTimeout(() => {
+            el.classList.add("fade-in-up");
+            el.style.animationDelay = index * 0.1 + "s";
+          }, 100);
+        });
+      }
+
+      function getSectionFeedback(score) {
+        if (score >= 31)
+          return "You feel like you're thriving, what helps you stay there?";
+        if (score >= 21)
+          return "You feel things are going well, what's your next step for growth?";
+        if (score >= 11)
+          return "You feel a bit stuck, what would make things clearer?";
+        return "Things may feel tough right now, what positive step feels possible?";
+      }
+
+      function getOverallFeedback(score) {
+        if (score >= 91) {
+          return "You're on a strong path. But how do you maintain it and go to the next level? You're already moving in a direction that works for you. Coaching could help you refine your goals, stretch your potential, or maintain balance as you continue growing.";
+        }
+        if (score >= 61) {
+          return "Things are going well but there's room for coaching support. You have solid foundations in place, and coaching might help you gain clarity, strengthen confidence, or fine-tune the areas that feel less steady. Small shifts here could have a big impact. There might be some specific things holding you back, maybe you don't even know what they are.";
+        }
+        if (score >= 31) {
+          return "Things feel complicated across a few areas for you. Coaching may bring clarity. You may be navigating some challenges or uncertainty. Coaching can offer a safe space to explore what's holding you back, reconnect with what matters most, and create a plan for your future.";
+        }
+        return "You're likely at a crossroads and coaching could be transformational. This could be a moment of change or new direction. Coaching can help you step back, regain perspective, and uncover what's next. You don't have to stay in this place forever.";
+      }
+
+      function downloadPDF() {
+        // Get current results data
+        const section1 = answers[0] + answers[1] + answers[2] + answers[3];
+        const section2 = answers[4] + answers[5] + answers[6] + answers[7];
+        const section3 = answers[8] + answers[9] + answers[10] + answers[11];
+        const total = section1 + section2 + section3;
+
+        // Create PDF content matching the results screen design
+        const pdfContent = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>Career Assessment Results</title>
+            <style>
+              @font-face {
+                font-family: "GT Alpina";
+                src: url("GT-Alpina-Standard-Light.ttf") format("truetype");
+                font-weight: 300;
+                font-style: normal;
+              }
+              
+              * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+              }
+              
+              body {
+                font-family: "Helvetica Now Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+                background: #708356;
+                color: white;
+                min-height: 100vh;
+                padding: 40px;
+              }
+              
+              .results-content {
+                max-width: 900px;
+                width: 100%;
+                text-align: center;
+                margin: 0 auto;
+              }
+              
+              .total-score-display {
+                margin-bottom: 60px;
+              }
+              
+              .total-score-display h2 {
+                font-family: "GT Alpina", serif;
+                font-weight: 300;
+                font-size: 1.5em;
+                margin-bottom: 20px;
+                color: white;
+              }
+              
+              .total-score {
+                font-size: 4em;
+                font-weight: bold;
+                color: white;
+                margin: 20px 0;
+              }
+              
+              .score-label {
+                font-size: 1.2em;
+                opacity: 0.8;
+                color: white;
+              }
+              
+              .section-scores {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 30px;
+                margin-bottom: 60px;
+              }
+              
+              .section-score-card {
+                background: rgba(255, 255, 255, 0.1);
+                padding: 40px;
+                border-radius: 15px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+              }
+              
+              .section-score-card h3 {
+                font-family: "GT Alpina", serif;
+                font-weight: 300;
+                font-size: 1.8em;
+                margin-bottom: 20px;
+                color: white;
+              }
+              
+              .section-score-value {
+                font-size: 2.5em;
+                font-weight: bold;
+                color: white;
+                margin: 20px 0;
+              }
+              
+              .section-feedback {
+                font-size: 1.1em;
+                line-height: 1.7;
+                opacity: 0.9;
+                color: white;
+              }
+              
+              .feedback-section {
+                background: rgba(255, 255, 255, 0.1);
+                padding: 40px;
+                border-radius: 15px;
+                margin-bottom: 40px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+              }
+              
+              .feedback-section h3 {
+                font-family: "GT Alpina", serif;
+                font-weight: 300;
+                font-size: 1.8em;
+                margin-bottom: 20px;
+                color: white;
+              }
+              
+              .feedback-section p {
+                font-size: 1.1em;
+                line-height: 1.7;
+                opacity: 0.9;
+                color: white;
+              }
+              
+              .footer {
+                text-align: center;
+                margin-top: 50px;
+                padding-top: 20px;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 0.9em;
+              }
+              
+              @media print {
+                body {
+                  background: #708356 !important;
+                  -webkit-print-color-adjust: exact;
+                  print-color-adjust: exact;
+                }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="results-content">
+              <div class="total-score-display">
+                <h2>Your Total Score</h2>
+                <div class="total-score">${total}</div>
+                <div class="score-label">out of 120</div>
+              </div>
+
+              <div class="section-scores">
+                <div class="section-score-card">
+                  <h3>Career Direction & Alignment</h3>
+                  <div class="section-score-value">${section1}/40</div>
+                  <div class="section-feedback">${getSectionFeedback(
+                    section1
+                  )}</div>
+                </div>
+                <div class="section-score-card">
+                  <h3>Barriers & Self-Belief</h3>
+                  <div class="section-score-value">${section2}/40</div>
+                  <div class="section-feedback">${getSectionFeedback(
+                    section2
+                  )}</div>
+                </div>
+                <div class="section-score-card">
+                  <h3>Skills & Development</h3>
+                  <div class="section-score-value">${section3}/40</div>
+                  <div class="section-feedback">${getSectionFeedback(
+                    section3
+                  )}</div>
+                </div>
+              </div>
+
+              <div class="feedback-section">
+                <h3>How might coaching help you?</h3>
+                <p>${getOverallFeedback(total)}</p>
+              </div>
+
+              <div class="footer">
+                <p>Assessment completed on ${new Date().toLocaleDateString()}</p>
+                <p>This assessment is designed to help you understand your career satisfaction and identify areas for growth.</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+
+        // Create a new window with the PDF content
+        const printWindow = window.open("", "_blank");
+        printWindow.document.write(pdfContent);
+        printWindow.document.close();
+
+        // Wait for content to load, then trigger print
+        printWindow.onload = function () {
+          printWindow.print();
+        };
+      }
+
+      function restartQuiz() {
+        // Reset everything
+        currentQuestion = 0;
+        Object.keys(answers).forEach((key) => delete answers[key]);
+
+        // Hide results
+        document.getElementById("resultsScreen").classList.remove("active");
+
+        // Clear and re-render questions
+        document.getElementById("questionContainer").innerHTML = "";
+        document.getElementById("questionContainer").style.display = "block";
+
+        // Show welcome screen
+        document.getElementById("welcomeScreen").classList.remove("hidden");
+
+        // Reset progress
+        document.getElementById("progressBar").style.width = "0%";
+      }
+    </script>
+  </body>
+</html>
